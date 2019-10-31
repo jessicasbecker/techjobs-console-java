@@ -7,9 +7,11 @@ import org.apache.commons.csv.CSVRecord;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.Reader;
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.regex.Pattern;
 
 /**
  * Created by LaunchCode
@@ -76,13 +78,35 @@ public class JobData {
 
             String aValue = row.get(column);
 
-            if (aValue.contains(value)) {
+            if (Pattern.compile(Pattern.quote(value), Pattern.CASE_INSENSITIVE).matcher(aValue).find()) {
                 jobs.add(row);
             }
         }
 
         return jobs;
     }
+
+    public static ArrayList<HashMap<String, String>> findByValue(String term) {
+
+
+        loadData();
+
+        ArrayList<HashMap<String, String>> jobs = new ArrayList<>();
+
+        for (HashMap<String, String> row : allJobs) {
+    //Loop through all the fields in the dictionary
+            for (String fields : row.values()) {//we need the rows and not the columns b/c the data our users need is in the rows, not the header
+                if (Pattern.compile(Pattern.quote(term), Pattern.CASE_INSENSITIVE).matcher(fields).find()) {
+                    // if match found, add the row
+                    jobs.add(row);
+                }
+            }
+        }
+    return jobs;
+    }
+
+
+
 
     /**
      * Read in data from a CSV file and store it in a list
